@@ -88,8 +88,6 @@ function arrayManipulator(input, manipulations) {
                 break;
             case 'remove':
                 numbers = remove(numbers, commandArgs[0]);
-
-                //commandArgs[0] i na drugite vij.
                 break;
             case 'shift':
                 shift(numbers, commandArgs[0]);
