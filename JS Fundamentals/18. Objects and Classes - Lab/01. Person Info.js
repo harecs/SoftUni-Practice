@@ -1,5 +1,5 @@
 function printPersonInfo(firstName, lastName, age) {
-    let person = {}
+    let person = {};
     person.firstName = firstName;
     person.lastName = lastName;
     person.age = age;
