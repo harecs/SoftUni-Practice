@@ -1,12 +1,21 @@
-function calculateTimeToWalk(steps, stepLength, speed) {
-    let distance = (steps * stepLength) / 1000;
-    let rawTime = distance / speed;
-    let hours = rawTime / 1 - rawTime % 1;
+function calculateTimeToWalk(steps, stepLength, speedKmPH) {
+    let distance = (steps * stepLength);
+    let speedMPS = speedKmPH / 3.6;
+    let totalSeconds = distance / speedMPS;
+    let restMinutes = Math.floor(distance / 500);
 
-    rawTime -= hours;
-    let minutes = rawTime * 100 / 60;
-    console.log(`${minutes}`);
+    let hours = Math.floor(totalSeconds / 3600);
+    totalSeconds -= hours * 3600;
+
+    let minutes = Math.floor(totalSeconds / 60);
+    totalSeconds -= minutes * 60;
+    minutes += restMinutes;
+
+    let seconds = Math.round(totalSeconds);
+
+    let hoursText = hours < 10 ? `0${hours}` : hours;
+    let minutesText = minutes < 10 ? `0${minutes}` : minutes;
+    let secondsText = seconds < 10 ? `0${seconds}` : seconds;
+    
+    console.log(`${hoursText}:${minutesText}:${secondsText}`);
 }
-
-calculateTimeToWalk(4000, 0.60, 5);
-calculateTimeToWalk(2564, 0.70, 5.5);
