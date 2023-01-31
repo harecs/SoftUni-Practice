@@ -1,28 +1,16 @@
 function search() {
-	// document.getElementById('result').innerText = '';
-	// let list = document.getElementsByTagName('li');
+	const searchedText = document.getElementById('searchText').value;
+	const townsElements = Array.from(document.getElementById('towns').children);
+	let totalMatches = 0;
 
-	// for (let i = 0; i < list.length; i++) {
-	// 	let text = list[i].innerText;
-	// 	list[i].innerHTML = text;
-	// }
+	for (let townElement of townsElements) {
+		if (townElement.textContent.includes(searchedText)) {
+			townElement.style.fontWeight = 'bold';
+			townElement.style.textDecoration = 'underline';
 
-	// let townsElements = document.getElementsByTagName('li');
-	// let searchText = document.getElementById('searchText').value;
-	// let matchesCount = 0;
+			totalMatches++;
+		}
+	}
 
-	// for (let i = 0; i < townsElements.length; i++) {
-	// 	let townElement = townsElements[i]
-	// 	const townText = townElement.innerText;
-
-	// 	if (searchText && townText.indexOf(searchText) > -1) {
-	// 		townElement.style.fontWeight = 'bold';
-	// 		townElement.style.textDecoration = 'underline';
-	// 		matchesCount++;
-	// 	} else {
-	// 		townElement.innerHTML = townText;
-	// 	}
-	// }
-
-	// document.getElementById('result').innerText = `${matchesCount}  matches found`;
+	document.getElementById('result').textContent = `${totalMatches.toString()} matches found`;
 }
