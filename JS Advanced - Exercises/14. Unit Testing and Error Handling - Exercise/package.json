@@ -1,0 +1,19 @@
+{
+  "name": "14.-unit-testing-and-error-handling---exercise",
+  "version": "1.0.0",
+  "description": "",
+  "main": "01. Request Validator.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0"
+  }
+}
