@@ -7,6 +7,8 @@ const loginViewEle = document.getElementById('login-view');
 const homeViewEle = document.getElementById('home-view');
 const catchesEle = document.getElementById('catches');
 const addButton = document.querySelector('.add');
+const registerNotificationEle = document.querySelector('#register .notification');
+const loginNotificationEle = document.querySelector('#login .notification');
 
 registerViewEle.style.display = 'none';
 loginViewEle.style.display = 'none';
@@ -33,10 +35,12 @@ function attachEvents() {
     document.querySelector('section form[id="register"] button').addEventListener('click', onRegister);
     document.querySelector('section form[id="login"] button').addEventListener('click', onLogin);
     document.querySelector('aside button').addEventListener('click', onLoad);
-
+    document.querySelector('#catches').addEventListener('click', onCatchClick);
     document.querySelector('nav a[id="register"]').addEventListener('click', onRegisterNavButton);
     document.querySelector('nav a[id="login"]').addEventListener('click', onLoginNavButton);
     document.querySelector('nav a[id="logout"]').addEventListener('click', onLogout);
+    document.querySelector('.add').addEventListener('click', onAdd);
+    document.querySelector('#home').addEventListener('click', onHomeNavButton);
 }
 
 async function onRegister(e) {
@@ -47,11 +51,15 @@ async function onRegister(e) {
     const { email, password, rePass } = Object.fromEntries(formData);
 
     if (email == '' || password == '' || rePass == '') {
-        alert('All form fields must be completed');
+        // alert('All form fields must be completed');
+        registerNotificationEle.textContent = 'All form fields must be completed';
+        return;
     }
 
     if (password !== rePass) {
-        alert(`Passwords don't match`);
+        // alert(`Passwords don't match`);
+        registerNotificationEle.textContent = `Passwords don't match`;
+        return;
     }
 
     const options = {
@@ -63,8 +71,6 @@ async function onRegister(e) {
     try {
         const res = await fetch(url, options);
         const data = res.ok ? await res.json() : new Error();
-
-        console.log(data);
 
         localStorage.setItem('email', data.email);
         localStorage.setItem('id', data._id);
@@ -95,17 +101,22 @@ async function onLogin(e) {
 
     try {
         const res = await fetch(url, options);
-        const data = res.ok ? await res.json() : new Error();
+        if (res.status !== 403) {
+            const data = res.ok ? await res.json() : new Error();
 
-        localStorage.setItem('email', data.email);
-        localStorage.setItem('id', data._id);
-        localStorage.setItem('token', data.accessToken);
+            localStorage.setItem('email', data.email);
+            localStorage.setItem('id', data._id);
+            localStorage.setItem('token', data.accessToken);
 
-        // location = './index.html';
-        mainElement.replaceChildren(homeViewEle);
-        homeViewEle.style.display = 'block';
-        changeNavBar();
-        addButton.removeAttribute('disabled');
+            // location = './index.html';
+            mainElement.replaceChildren(homeViewEle);
+            homeViewEle.style.display = 'block';
+            changeNavBar();
+            addButton.removeAttribute('disabled');
+            await onLoad();
+        } else {
+            loginNotificationEle.textContent = 'Email or password is invalid';
+        }
     } catch (err) {
         alert(err);
     }
@@ -115,28 +126,27 @@ async function onLogout() {
     const url = 'http://localhost:3030/users/logout';
 
     const options = {
-        method: 'GET',
         headers: {
-            'X-Authorization': localStorage.getItem('token'),
-            'Content-type': 'application/json'
+            'X-Authorization': localStorage.getItem('token') // here should be token
         }
     }
 
     try {
         const res = await fetch(url, options);
+        const data = res.ok ? await res.json() : new Error();
 
-        if (res.status !== 204) {
-            throw Error;
+        if (res.status === 204 && res.headers.has('Content-type')) {
+            
+            localStorage.clear();
+            // location = './index.html';
+            mainElement.replaceChildren(homeViewEle);
+            homeViewEle.style.display = 'block';
+            changeNavBar();
+            addButton.setAttribute('disabled', true);
+            attachEvents();
         }
-
-        localStorage.clear();
-        // location = './index.html';
-        mainElement.replaceChildren(homeViewEle);
-        homeViewEle.style.display = 'block';
-        changeNavBar();
-        addButton.setAttribute('disabled', true);
     } catch (err) {
-        alert(err);
+        console.error(err);
     }
 }
 
@@ -146,7 +156,6 @@ async function onLoad() {
     try {
         const res = await fetch('http://localhost:3030/data/catches');
         const data = res.ok ? await res.json() : new Error();
-        console.log(data);
 
         data.forEach(fishCatch => {
             catchesEle
@@ -175,9 +184,105 @@ async function onLoad() {
                     .forEach(ele => ele.removeAttribute('disabled'));
             }
         });
+
+        attachEvents();
     } catch (err) {
         console.error(err);
     }
+}
+
+async function onCatchClick(e) {
+    const dataId = e.target.getAttribute('data-id');
+    const url = `http://localhost:3030/data/catches/${dataId}`;
+    const currentCatch = e.target.parentElement;
+
+    if (e.target.textContent === 'Delete') {
+        const options = {
+            method: 'DELETE',
+            headers: { 'X-Authorization': localStorage.getItem('token') }
+        }
+        try {
+            const res = await fetch(url, options);
+            const data = res.ok ? await res.json() : new Error();
+
+            await onLoad();
+        } catch (err) {
+            console.error(err);
+        }
+    } else if (e.target.textContent === 'Update') {
+        const options = {
+            method: 'PUT',
+            headers: {
+                'X-Authorization': localStorage.getItem('token'),
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                angler: currentCatch.querySelector('.angler').value,
+                weight: Number(currentCatch.querySelector('.weight').value),
+                species: currentCatch.querySelector('.species').value,
+                location: currentCatch.querySelector('.location').value,
+                bait: currentCatch.querySelector('.bait').value,
+                captureTime: Number(currentCatch.querySelector('.captureTime').value),
+                _id: dataId,
+                _ownerId: localStorage.getItem('id')
+            })
+        }
+
+        try {
+            const res = await fetch(url, options);
+            const data = res.ok ? await res.json() : new Error();
+
+            await onLoad();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+}
+
+async function onAdd(e) {
+    e.preventDefault()
+
+    const formData = new FormData(document.forms['addForm']);
+    const {
+        angler,
+        weight,
+        species,
+        location,
+        bait,
+        captureTime
+    } = Object.fromEntries(formData);
+
+    if (angler && weight && species && location && bait && captureTime) {
+        const url = ' http://localhost:3030/data/catches';
+        const options = {
+            method: 'POST',
+            headers: {
+                'X-Authorization': localStorage.getItem('token'),
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                angler,
+                weight,
+                species,
+                location,
+                bait,
+                captureTime,
+                _ownerId: localStorage.getItem('id')
+            })
+        };
+
+        try {
+            const res = await fetch(url, options);
+            const data = res.ok ? await res.json() : new Error();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+}
+
+function onHomeNavButton() {
+    mainElement.replaceChildren(homeViewEle);
+    homeViewEle.style.display = 'block';
 }
 
 function onRegisterNavButton() {
