@@ -1,5 +1,8 @@
+import { displayComments } from "./comments.js";
+
 export async function showPost(e) {
-    const url = `http://localhost:3030/jsonstore/collections/myboard/posts/${e.target.id}`;
+    const id = e.target.id;
+    const url = `http://localhost:3030/jsonstore/collections/myboard/posts/${id}`;
 
     try {
         const res = await fetch(url);
@@ -18,6 +21,7 @@ export async function showPost(e) {
         document.querySelector('.comment .header p time').textContent = data.time;
         document.querySelector('.comment .header .post-content').textContent = data.content;
 
+        displayComments(id);
     } catch (err) {
         console.error(err);
     }
