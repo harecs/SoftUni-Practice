@@ -1,0 +1,15 @@
+{
+  "name": "05.-client-side-rendering---exercise",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lit-html": "^2.7.2"
+  }
+}
