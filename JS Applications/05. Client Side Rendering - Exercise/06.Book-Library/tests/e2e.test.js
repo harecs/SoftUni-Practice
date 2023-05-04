@@ -11,18 +11,18 @@ const slowMo = 500;
 const mockData = {
   catalog: [
     {
-      title: 'A Court Of Silver Flame',
-      author: 'Sara J Maas',
+      title: 'Book 1',
+      author: 'Pesho',
       _id: '1001',
     },
     {
-      title: '1984',
-      author: 'Oruel',
+      title: 'Book 2',
+      author: 'Gosho',
       _id: '1002',
     },
     {
-      title: 'The Mortal Instruments',
-      author: 'Cassandra Clare',
+      title: 'Book 3',
+      author: 'Stamat',
       _id: '1003',
     },
   ],
