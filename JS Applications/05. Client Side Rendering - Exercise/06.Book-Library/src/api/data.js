@@ -20,3 +20,7 @@ export async function createBook(data) {
 export async function updateBook(id, data) {
     return api.put(endpoints.book + id, data);
 }
+
+export async function deleteBook(id) {
+    return api.delete(endpoints.book + id);
+}
